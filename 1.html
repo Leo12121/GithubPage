@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <title>Mapa con GPS en Tiempo Real</title>
+  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+  <style>
+    #map { height: 90vh; width: 100%; }
+  </style>
+</head>
+<body>
+  <h1>Mi ubicación en tiempo real</h1>
+  <div id="map">Cargando mapa...</div>
+
+  <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+  <script>
+    let map, marker;
+
+    function iniciarMapa() {
+      map = L.map('map').setView([0, 0], 15); // Inicializa en el centro del mundo
+
+      L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+        maxZoom: 19,
+        attribution: '© OpenStreetMap'
+      }).addTo(map);
+
+      marker = L.marker([0, 0]).addTo(map).bindPopup("Tu ubicación").openPopup();
+    }
+
+    function rastrearUbicacion() {
+      if ("geolocation" in navigator) {
+        navigator.geolocation.watchPosition(
+          function(pos) {
+            const lat = pos.coords.latitude;
+            const lon = pos.coords.longitude;
+
+            marker.setLatLng([lat, lon]);
+            map.setView([lat, lon], 18); // Zoom alto para más detalle
+          },
+          function(err) {
+            alert("Error obteniendo ubicación: " + err.message);
+          },
+          {
+            enableHighAccuracy: true,
+            timeout: 10000,
+            maximumAge: 0
+          }
+        );
+      } else {
+        alert("Tu navegador no soporta geolocalización.");
+      }
+    }
+
+    iniciarMapa();
+    rastrearUbicacion();
+  </script>
+</body>
+</html>
